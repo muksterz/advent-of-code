@@ -4,7 +4,7 @@ use std::{
     fmt::Display,
 };
 
-use aoc_runner_derive::aoc;
+use runner::aoc;
 
 #[derive(PartialEq, Eq, Debug, Clone, Copy, Hash)]
 enum Card {
@@ -28,7 +28,7 @@ impl Card {
             Card::A => 14,
             Card::K => 13,
             Card::Q => 12,
-            Card::J => 0,
+            Card::J => 11,
             Card::T => 10,
             Card::N(n) => n,
         }
@@ -58,17 +58,11 @@ impl Card {
 struct Hand {
     cards: [Card; 5],
     bid: u64,
-    max_cards: [Card; 5],
 }
 
 impl Display for Hand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for c in self.cards {
-            write!(f, "{}", c.to_char())?;
-        }
-        write!(f, "\tmax: ")?;
-
-        for c in self.max_cards {
             write!(f, "{}", c.to_char())?;
         }
 
@@ -82,7 +76,7 @@ impl Hand {
     fn rank(&self) -> Type {
         let mut set: HashMap<Card, u64> = HashMap::new();
 
-        for c in self.max_cards.iter().copied() {
+        for c in self.cards.iter().copied() {
             let entry = set.entry(c).or_default();
             *entry += 1;
         }
@@ -106,54 +100,33 @@ impl Hand {
 
         t
     }
-
-    fn maximize(self) -> Self {
-        let mut map: HashMap<_, u64> = HashMap::new();
-        for c in self.cards.iter().copied() {
-            if c != Card::J {
-                let entry = map.entry(c).or_default();
-                *entry += 1;
-            }
-        }
-
-        let mut cs: Vec<_> = map.into_iter().collect();
-        cs.sort_by_key(|(_, n)| Reverse(*n));
-
-        let card = if cs.is_empty() { Card::A } else { cs[0].0 };
-
-        Self {
-            cards: self.cards,
-            bid: self.bid,
-            max_cards: self.cards.map(|c| if c == Card::J { card } else { c }),
-        }
-    }
 }
 
 impl PartialOrd for Hand {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
+        let t = self.rank();
+        let t_o = other.rank();
+
+        match t.cmp(&t_o) {
+            Ordering::Less => Some(Ordering::Less),
+            Ordering::Greater => Some(Ordering::Greater),
+            Ordering::Equal => {
+                for (c, c_o) in self.cards.iter().copied().zip(other.cards) {
+                    match c.cmp(&c_o) {
+                        Ordering::Less => return Some(Ordering::Less),
+                        Ordering::Greater => return Some(Ordering::Greater),
+                        Ordering::Equal => {}
+                    }
+                }
+                Some(Ordering::Equal)
+            }
+        }
     }
 }
 
 impl Ord for Hand {
     fn cmp(&self, other: &Self) -> Ordering {
-        let t = self.rank();
-        let t_o = other.rank();
-
-        match t.cmp(&t_o) {
-            Ordering::Less => Ordering::Less,
-            Ordering::Greater => Ordering::Greater,
-            Ordering::Equal => {
-                for (c, c_o) in self.cards.iter().copied().zip(other.cards) {
-                    match c.cmp(&c_o) {
-                        Ordering::Less => return Ordering::Less,
-                        Ordering::Greater => return Ordering::Greater,
-                        Ordering::Equal => {}
-                    }
-                }
-                Ordering::Equal
-            }
-        }
+        self.partial_cmp(other).unwrap()
     }
 }
 
@@ -213,12 +186,10 @@ fn parse_hand(input: &str) -> Hand {
     Hand {
         cards,
         bid: u64::from_str_radix(bid, 10).unwrap(),
-        max_cards: cards,
     }
-    .maximize()
 }
 
-#[aoc(day7, part2)]
+#[aoc(day7, part1)]
 fn part1(input: &str) -> u64 {
     let cards = input.trim().lines().map(parse_hand).collect::<Vec<_>>();
 
@@ -241,7 +212,7 @@ fn part1(input: &str) -> u64 {
 mod tests {
 
     #[test]
-    fn part2() {
+    fn part1() {
         let input = "
             32T3K 765
             T55J5 684
@@ -251,6 +222,6 @@ mod tests {
         "
         .trim();
 
-        assert_eq!(super::part1(input), 5905);
+        assert_eq!(super::part1(input), 6440);
     }
 }

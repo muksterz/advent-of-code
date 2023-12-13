@@ -1,6 +1,6 @@
 use std::ops::{Add, Index, IndexMut, Sub};
 
-use aoc_runner_derive::aoc;
+use runner::aoc;
 
 #[derive(Debug)]
 struct Grid {

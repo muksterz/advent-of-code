@@ -1,4 +1,4 @@
-use aoc_runner_derive::aoc;
+use runner::aoc;
 
 #[derive(Debug)]
 struct Sequence {

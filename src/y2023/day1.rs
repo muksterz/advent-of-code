@@ -1,4 +1,4 @@
-use aoc_runner_derive::aoc;
+use runner::aoc;
 
 #[aoc(day1, part1)]
 fn part1(input: &str) -> u64 {

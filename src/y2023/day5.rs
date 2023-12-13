@@ -1,6 +1,6 @@
 use std::ops::Range;
 
-use aoc_runner_derive::aoc;
+use runner::aoc;
 
 #[derive(Clone, Debug)]
 struct Map {

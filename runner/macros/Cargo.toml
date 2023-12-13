@@ -1,0 +1,14 @@
+[package]
+name = "macros"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+proc_macro = true
+
+[dependencies]
+syn = { version = "2.0.41", features = ["full"] }
+proc-macro2 = "1.0.70"
+quote = "1.0.33"
+whoami = "1.4.1"
+keyring = "2.1.0"

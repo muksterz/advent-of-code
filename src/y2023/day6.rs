@@ -1,4 +1,4 @@
-use aoc_runner_derive::aoc;
+use runner::aoc;
 
 fn parse_nums(input: &str) -> Vec<u64> {
     let (_, nums) = input.split_once(':').unwrap();
