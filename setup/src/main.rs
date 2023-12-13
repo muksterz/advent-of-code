@@ -1,4 +1,8 @@
+use std::sync::Arc;
+
 use keyring::Entry;
+use reqwest::{cookie::Jar, Url};
+use time::{UtcOffset, OffsetDateTime};
 
 fn main() {
     let mut args = std::env::args().skip(1);
@@ -6,19 +10,19 @@ fn main() {
 
 
     match cmd.as_str() {
-        "get" => get_token(),
+        "get" => println!("{}", get_token()),
         "set" => set_token(args.next().unwrap()),
+        "download" => download(),
         _ => panic!()
     }
 
 
 }
 
-fn get_token() {
+fn get_token() -> String{
     let entry = keyring::Entry::new("aoc_runner", &whoami::username()).unwrap();
     let token = entry.get_password().expect("No token found");
-    println!("{token}");
-
+    token
 }
 
 fn set_token(token: String) {
@@ -26,3 +30,24 @@ fn set_token(token: String) {
     let entry = Entry::new("aoc_runner", &user).unwrap();
     entry.set_password(&token).unwrap();
 }
+
+fn download() {
+    let today = OffsetDateTime::now_utc();
+    let today = today.to_offset(UtcOffset::from_hms(-5, 0, 0).unwrap());
+    let year = today.year();
+    let day = today.day();
+    let file = format!("input/{year}/day{day}.txt");
+    let session = get_token();
+    if std::fs::metadata(&file).is_err() {
+        let url = format!("https://adventofcode.com/{year}/day/{day}/input");
+        let cookies = Jar::default();
+        cookies.add_cookie_str(&format!("session={session}"), &url.parse::<Url>().unwrap());
+        let client = reqwest::blocking::Client::builder().cookie_provider(Arc::new(cookies)).build().unwrap();
+        let r = client.get(url).send().unwrap();
+        std::fs::write(&file, r.text().unwrap()).unwrap();
+        println!("Downloaded {year}/day/{day} to {file}");
+    } else {
+        println!("Input already downloaded at {file}");
+    }
+}
+
