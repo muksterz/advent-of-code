@@ -1,4 +1,4 @@
-use std::{collections::HashMap, hash::BuildHasher};
+use std::collections::HashMap;
 
 use runner::aoc;
 
@@ -54,7 +54,7 @@ impl Spring {
         Spring::solve(&mut cache, &self.parts, 0, &self.lengths, 0)
     }
 
-    fn solve<S: BuildHasher>(mut cache: &mut HashMap<HashStruct, u64, S>,  parts: &[Part], index: usize, lengths: &[usize], lengths_index: usize) -> u64 {
+    fn solve(mut cache: &mut HashMap<HashStruct, u64>,  parts: &[Part], index: usize, lengths: &[usize], lengths_index: usize) -> u64 {
 
         fn check(index: usize, len: usize, parts: &[Part], last: bool) -> bool {
             if index > 0 && parts[index-1] == Part::Broken {
