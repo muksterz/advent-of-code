@@ -1,7 +1,7 @@
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use proc_macro::*;
-use syn::{parse::Parse, parse_macro_input, Ident, ItemFn, Token};
+use syn::{parse::Parse, parse_macro_input, ItemFn, Token};
 
 static CURRENT_YEAR: AtomicU64 = AtomicU64::new(0);
 
@@ -104,17 +104,11 @@ impl Parse for Problem {
 
 struct Year {
     year: u64,
-    rest: TokenStream,
 }
 
 impl Parse for Year {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
-        let i = input.parse::<Ident>()?;
-        if i.to_string() != "year" {
-            return Err(syn::Error::new(i.span(), "Expected \"year\""));
-        }
 
-        input.parse::<Token![=]>()?;
         let yearl = input.parse::<proc_macro2::Literal>()?;
         let year = u64::from_str_radix(&yearl.to_string(), 10);
         let year = match year {
@@ -122,20 +116,17 @@ impl Parse for Year {
             Err(_) => return Err(syn::Error::new(yearl.span(), "Expected number")),
         };
 
-        input.parse::<Token![,]>()?;
 
-        let rest = input.parse::<proc_macro2::TokenStream>()?;
 
         Ok(Self {
             year,
-            rest: rest.into(),
         })
     }
 }
 
 #[proc_macro]
-pub fn aoc_mod(input: TokenStream) -> TokenStream {
+pub fn aoc_year(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as Year);
     CURRENT_YEAR.store(input.year, Ordering::SeqCst);
-    input.rest
+    TokenStream::new()
 }

@@ -1,11 +1,10 @@
-use runner::aoc_mod;
 
-aoc_mod! {year = 2023,
-    mod y2023;
-}
+mod y2023;
+
+mod y2022;
 
 fn main() {
-
-    runner::run_recent()
+    runner::run_year(2022);
+    //runner::run_recent()
 
 }

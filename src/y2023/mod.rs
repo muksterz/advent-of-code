@@ -1,4 +1,6 @@
 
+runner::aoc_year!(2023);
+
 mod day1;
 mod day2;
 mod day3;
