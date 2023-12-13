@@ -12,7 +12,7 @@ fn main() {
     match cmd.as_str() {
         "get" => println!("{}", get_token()),
         "set" => set_token(args.next().unwrap()),
-        "download" => download(),
+        "download" => download(args),
         _ => panic!()
     }
 
@@ -31,13 +31,15 @@ fn set_token(token: String) {
     entry.set_password(&token).unwrap();
 }
 
-fn download() {
+fn download(mut args: impl Iterator<Item = String>) {
     let today = OffsetDateTime::now_utc();
     let today = today.to_offset(UtcOffset::from_hms(-5, 0, 0).unwrap());
-    let year = today.year();
-    let day = today.day();
+    let year = args.next().map(|n| i32::from_str_radix(&n, 10).unwrap()).unwrap_or(today.year());
+    let day = args.next().map(|n| u8::from_str_radix(&n, 10).unwrap()).unwrap_or(today.day());
     let file = format!("input/{year}/day{day}.txt");
     let session = get_token();
+
+
     if std::fs::metadata(&file).is_err() {
         let url = format!("https://adventofcode.com/{year}/day/{day}/input");
         let cookies = Jar::default();
