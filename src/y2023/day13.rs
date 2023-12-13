@@ -1,9 +1,8 @@
-
 use runner::aoc;
 
 struct Grid {
     row_major: Vec<Vec<char>>,
-    col_major: Vec<Vec<char>>
+    col_major: Vec<Vec<char>>,
 }
 
 impl Grid {
@@ -22,9 +21,9 @@ impl Grid {
         }
 
         Self {
-            row_major, col_major: column_major
+            row_major,
+            col_major: column_major,
         }
-
     }
 
     fn reflections(&self) -> u64 {
@@ -41,7 +40,7 @@ impl Grid {
         let outer = self.row_major.len();
         for i in 1..outer {
             let mut mirror = true;
-            for(i1, i2) in (0..i).rev().zip((i)..outer) {
+            for (i1, i2) in (0..i).rev().zip((i)..outer) {
                 if i2 >= outer {
                     continue;
                 }
@@ -57,7 +56,6 @@ impl Grid {
             }
         }
 
-
         0
     }
 
@@ -65,7 +63,7 @@ impl Grid {
         let outer = self.col_major.len();
         for i in 1..outer {
             let mut mirror = true;
-            for(i1, i2) in (0..i).rev().zip((i)..outer) {
+            for (i1, i2) in (0..i).rev().zip((i)..outer) {
                 if i2 >= outer {
                     continue;
                 }
@@ -81,7 +79,6 @@ impl Grid {
             }
         }
 
-
         0
     }
 
@@ -89,7 +86,7 @@ impl Grid {
         let outer = self.row_major.len();
         for i in 1..outer {
             let mut diff = 0;
-            for(i1, i2) in (0..i).rev().zip((i)..outer) {
+            for (i1, i2) in (0..i).rev().zip((i)..outer) {
                 if i2 >= outer {
                     continue;
                 }
@@ -109,7 +106,7 @@ impl Grid {
         let outer = self.col_major.len();
         for i in 1..outer {
             let mut diff = 0;
-            for(i1, i2) in (0..i).rev().zip((i)..outer) {
+            for (i1, i2) in (0..i).rev().zip((i)..outer) {
                 if i2 >= outer {
                     continue;
                 }
@@ -128,13 +125,11 @@ impl Grid {
 
 #[aoc(day13, part1)]
 fn part1(input: &str) -> u64 {
-
     let grids: Vec<Grid> = input.split("\n\n").map(Grid::parse).collect();
     let mut total = 0;
     for g in grids {
         total += g.reflections();
     }
-
 
     total
 }
@@ -147,9 +142,7 @@ fn part2(input: &str) -> u64 {
         total += g.reflections_smudge();
     }
 
-
     total
-
 }
 
 #[cfg(test)]
@@ -173,7 +166,8 @@ mod tests {
             #####.##.
             ..##..###
             #....#..#
-        ".trim();
+        "
+        .trim();
 
         assert_eq!(super::part1(input), 405)
     }
@@ -196,7 +190,8 @@ mod tests {
             #####.##.
             ..##..###
             #....#..#
-        ".trim();
+        "
+        .trim();
 
         assert_eq!(super::part2(input), 400)
     }

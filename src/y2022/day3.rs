@@ -1,4 +1,3 @@
-
 use runner::aoc;
 
 fn priority(c: char) -> u64 {
@@ -16,7 +15,7 @@ fn part1(input: &str) -> u64 {
     let mut total = 0;
     for l in input.trim().lines() {
         let l = l.trim();
-        let split = l.len()/2;
+        let split = l.len() / 2;
         let s1 = &l[0..split];
         let s2 = &l[split..];
         let mut p = 0;
@@ -64,7 +63,8 @@ mod tests {
             wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
             ttgJtRGJQctTZtZT
             CrZsJsPPZsGzwwsLwLmpwMDw
-        ".trim();
+        "
+        .trim();
 
         assert_eq!(super::part1(input), 157)
     }
@@ -78,7 +78,8 @@ mod tests {
             wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
             ttgJtRGJQctTZtZT
             CrZsJsPPZsGzwwsLwLmpwMDw
-        ".trim();
+        "
+        .trim();
 
         assert_eq!(super::part2(input), 70)
     }

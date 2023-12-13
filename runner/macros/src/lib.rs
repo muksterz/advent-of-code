@@ -17,7 +17,6 @@ pub fn aoc(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let i = func.sig.ident.clone();
 
-
     let path = format!("/input/{year}/day{day}.txt");
 
     quote::quote! {
@@ -108,7 +107,6 @@ struct Year {
 
 impl Parse for Year {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
-
         let yearl = input.parse::<proc_macro2::Literal>()?;
         let year = u64::from_str_radix(&yearl.to_string(), 10);
         let year = match year {
@@ -116,11 +114,7 @@ impl Parse for Year {
             Err(_) => return Err(syn::Error::new(yearl.span(), "Expected number")),
         };
 
-
-
-        Ok(Self {
-            year,
-        })
+        Ok(Self { year })
     }
 }
 

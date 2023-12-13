@@ -1,9 +1,6 @@
-
-
 use runner::aoc;
 
 type Range = std::ops::RangeInclusive<u64>;
-
 
 fn parse_range(input: &str) -> (Range, Range) {
     fn parse(input: &str) -> Range {
@@ -21,35 +18,36 @@ fn parse_range(input: &str) -> (Range, Range) {
 
 #[aoc(day4, part1)]
 fn part1(input: &str) -> u64 {
-
     let mut total = 0;
 
     for l in input.trim().lines().map(str::trim) {
         let (l, r) = parse_range(l);
-        if (l.contains(r.start()) && l.contains(r.end())) || (r.contains(l.start()) && r.contains(l.end())) {
+        if (l.contains(r.start()) && l.contains(r.end()))
+            || (r.contains(l.start()) && r.contains(l.end()))
+        {
             total += 1;
         }
     }
 
     total
-
 }
-
 
 #[aoc(day4, part2)]
 fn part2(input: &str) -> u64 {
-
     let mut total = 0;
 
     for l in input.trim().lines().map(str::trim) {
         let (l, r) = parse_range(l);
-        if l.contains(r.start()) || l.contains(r.end()) || r.contains(l.start()) || r.contains(l.end()) {
+        if l.contains(r.start())
+            || l.contains(r.end())
+            || r.contains(l.start())
+            || r.contains(l.end())
+        {
             total += 1;
         }
     }
 
     total
-
 }
 
 #[cfg(test)]
@@ -64,7 +62,8 @@ mod tests {
             2-8,3-7
             6-6,4-6
             2-6,4-8
-        ".trim();
+        "
+        .trim();
 
         assert_eq!(super::part1(input), 2);
     }
@@ -78,7 +77,8 @@ mod tests {
             2-8,3-7
             6-6,4-6
             2-6,4-8
-        ".trim();
+        "
+        .trim();
 
         assert_eq!(super::part2(input), 4);
     }

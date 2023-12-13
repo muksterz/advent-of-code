@@ -1,5 +1,5 @@
-use runner::aoc;
 use itertools::Itertools;
+use runner::aoc;
 
 #[derive(Debug, Clone)]
 struct Grid {
