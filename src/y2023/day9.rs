@@ -8,9 +8,8 @@ struct Sequence {
 impl Sequence {
     fn parse(input: &str) -> Self {
         let nums = input
-            .trim()
             .split_whitespace()
-            .map(|s| i64::from_str_radix(s, 10).unwrap())
+            .map(|s| s.parse().unwrap())
             .collect::<Vec<_>>();
 
         let mut diffs = vec![nums];

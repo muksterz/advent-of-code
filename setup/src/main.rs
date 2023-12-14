@@ -18,8 +18,7 @@ fn main() {
 
 fn get_token() -> String {
     let entry = keyring::Entry::new("aoc_runner", &whoami::username()).unwrap();
-    let token = entry.get_password().expect("No token found");
-    token
+    entry.get_password().expect("No token found")
 }
 
 fn set_token(token: String) {
@@ -33,11 +32,11 @@ fn download(mut args: impl Iterator<Item = String>) {
     let today = today.to_offset(UtcOffset::from_hms(-5, 0, 0).unwrap());
     let year = args
         .next()
-        .map(|n| i32::from_str_radix(&n, 10).unwrap())
+        .map(|n| n.parse().unwrap())
         .unwrap_or(today.year());
     let day = args
         .next()
-        .map(|n| u8::from_str_radix(&n, 10).unwrap())
+        .map(|n| n.parse().unwrap())
         .unwrap_or(today.day());
     let file = format!("input/{year}/day{day}.txt");
     let session = get_token();

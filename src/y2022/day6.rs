@@ -1,4 +1,3 @@
-
 use runner::aoc;
 
 fn check_unique(input: &[char]) -> bool {
@@ -13,6 +12,7 @@ fn check_unique(input: &[char]) -> bool {
 }
 
 #[aoc(day6, part1)]
+#[allow(clippy::just_underscores_and_digits)]
 fn part1(input: &str) -> u64 {
     let mut iter = input.chars().enumerate();
     let (_, _1) = iter.next().unwrap();
@@ -22,7 +22,7 @@ fn part1(input: &str) -> u64 {
 
     let mut buffer = [_1, _2, _3, _4];
 
-    for(i, c) in iter {
+    for (i, c) in iter {
         let loc = i % 4;
         buffer[loc] = c;
 
@@ -36,11 +36,10 @@ fn part1(input: &str) -> u64 {
 
 #[aoc(day6, part2)]
 fn part2(input: &str) -> u64 {
-
     const LEN: usize = 14;
     let mut iter = input.chars().enumerate();
-    
-    let a = [0; LEN -1];
+
+    let a = [0; LEN - 1];
     let a = a.map(|_| iter.next().unwrap().1);
 
     let mut buffer = ['0'; LEN];
@@ -48,7 +47,7 @@ fn part2(input: &str) -> u64 {
         buffer[i] = c;
     }
     buffer[LEN - 1] = buffer[0];
-    for(i, c) in iter {
+    for (i, c) in iter {
         let loc = i % buffer.len();
         buffer[loc] = c;
 

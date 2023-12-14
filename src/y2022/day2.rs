@@ -4,12 +4,12 @@ fn score(p1: char, p2: char) -> u64 {
     match (p1, p2) {
         ('A', 'X') => 1 + 3,
         ('A', 'Y') => 2 + 6,
-        ('A', 'Z') => 3 + 0,
-        ('B', 'X') => 1 + 0,
+        ('A', 'Z') => 3,
+        ('B', 'X') => 1,
         ('B', 'Y') => 2 + 3,
         ('B', 'Z') => 3 + 6,
         ('C', 'X') => 1 + 6,
-        ('C', 'Y') => 2 + 0,
+        ('C', 'Y') => 2,
         ('C', 'Z') => 3 + 3,
         _ => panic!(),
     }
@@ -22,7 +22,7 @@ fn part1(input: &str) -> u64 {
         .lines()
         .map(|l| {
             let l = l.trim();
-            score(l.chars().nth(0).unwrap(), l.chars().nth(2).unwrap())
+            score(l.chars().next().unwrap(), l.chars().nth(2).unwrap())
         })
         .sum()
 }
@@ -60,7 +60,7 @@ fn part2(input: &str) -> u64 {
         .lines()
         .map(|l| {
             let l = l.trim();
-            score_p2(l.chars().nth(0).unwrap(), l.chars().nth(2).unwrap())
+            score_p2(l.chars().next().unwrap(), l.chars().nth(2).unwrap())
         })
         .sum()
 }

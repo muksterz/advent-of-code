@@ -64,11 +64,11 @@ fn part1(input: &str) -> u64 {
         for round in game.rounds {
             for (c, n) in round.draws {
                 if c == "red" {
-                    red = red & (n <= 12);
+                    red &= n <= 12;
                 } else if c == "green" {
-                    green = green & (n <= 13);
+                    green &= n <= 13;
                 } else if c == "blue" {
-                    blue = blue & (n <= 14);
+                    blue &= n <= 14;
                 }
             }
         }

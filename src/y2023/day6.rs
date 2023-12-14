@@ -2,9 +2,8 @@ use runner::aoc;
 
 fn parse_nums(input: &str) -> Vec<u64> {
     let (_, nums) = input.split_once(':').unwrap();
-    nums.trim()
-        .split_whitespace()
-        .map(|n| u64::from_str_radix(n, 10).unwrap())
+    nums.split_whitespace()
+        .map(|n| n.parse().unwrap())
         .collect()
 }
 
@@ -46,8 +45,7 @@ fn part2(input: &str) -> u64 {
         .next()
         .unwrap()
         .split(':')
-        .skip(1)
-        .next()
+        .nth(1)
         .unwrap()
         .replace(' ', "")
         .parse()
@@ -56,8 +54,7 @@ fn part2(input: &str) -> u64 {
         .next()
         .unwrap()
         .split(':')
-        .skip(1)
-        .next()
+        .nth(1)
         .unwrap()
         .replace(' ', "")
         .parse()
@@ -80,9 +77,7 @@ fn part2(input: &str) -> u64 {
     let min_c = min_c.ceil() as u64;
     let max_c = max_c.floor() as u64;
 
-    let ways = max_c - min_c + 1;
-
-    ways
+    max_c - min_c + 1
 }
 
 #[cfg(test)]

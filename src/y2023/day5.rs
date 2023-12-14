@@ -11,10 +11,7 @@ struct Map {
 impl Map {
     // dest src len
     fn parse(input: &str) -> Self {
-        let mut nums = input
-            .trim()
-            .split_whitespace()
-            .map(|n| u64::from_str_radix(n, 10).unwrap());
+        let mut nums = input.split_whitespace().map(|n| n.parse().unwrap());
         let dest = nums.next().unwrap();
         let src = nums.next().unwrap();
         let len = nums.next().unwrap();
@@ -35,7 +32,7 @@ impl Map {
     }
 
     fn map_range(&self, input: Range<u64>) -> RangeMapOutput {
-        let m = match (
+        match (
             self.inputs.contains(&input.start),
             self.inputs.contains(&(input.end - 1)),
         ) {
@@ -72,8 +69,7 @@ impl Map {
                     RangeMapOutput::Disjoint
                 }
             }
-        };
-        m
+        }
     }
 
     fn map_contained_range(&self, input: Range<u64>) -> Range<u64> {
@@ -187,8 +183,8 @@ impl Maps {
         temp
     }
 
-    fn map_ranges(&self, ranges: &Vec<Range<u64>>) -> Vec<Range<u64>> {
-        let mut ranges = ranges.clone();
+    fn map_ranges(&self, ranges: &[Range<u64>]) -> Vec<Range<u64>> {
+        let mut ranges = ranges.to_vec();
         for map in self.maps.iter() {
             ranges = map.map_ranges(ranges);
         }
@@ -197,11 +193,7 @@ impl Maps {
 }
 
 fn parse_seeds(input: &str) -> Vec<u64> {
-    let nums = input
-        .trim()
-        .split_whitespace()
-        .skip(1)
-        .map(|s| u64::from_str_radix(s, 10).unwrap());
+    let nums = input.split_whitespace().skip(1).map(|s| s.parse().unwrap());
     nums.collect()
 }
 
@@ -224,11 +216,7 @@ fn part1(input: &str) -> u64 {
 }
 
 fn parse_seed_ranges(input: &str) -> Vec<Range<u64>> {
-    let mut nums = input
-        .trim()
-        .split_whitespace()
-        .skip(1)
-        .map(|s| u64::from_str_radix(s, 10).unwrap());
+    let mut nums = input.split_whitespace().skip(1).map(|s| s.parse().unwrap());
 
     let mut output = Vec::new();
 

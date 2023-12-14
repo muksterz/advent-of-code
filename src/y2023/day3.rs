@@ -91,20 +91,17 @@ impl Board {
             .iter()
             .filter_map(|(dr, dc)| self.get(row + dr, col + dc))
         {
-            match e {
-                Element::Number { value, id, .. } => {
-                    if !ids.contains(&id) {
-                        numbers += 1;
-                        ratio *= value;
-                        ids.push(id)
-                    }
+            if let Element::Number { value, id, .. } = e {
+                if !ids.contains(&id) {
+                    numbers += 1;
+                    ratio *= value;
+                    ids.push(id)
                 }
-                _ => {}
             }
         }
 
         if numbers == 2 {
-            return Some(ratio);
+            Some(ratio)
         } else {
             None
         }
@@ -128,10 +125,7 @@ impl Element {
     }
 
     fn is_symbol(self) -> bool {
-        match self {
-            Element::Part(_) => true,
-            _ => false,
-        }
+        matches!(self, Element::Part(_))
     }
 }
 
@@ -149,6 +143,7 @@ fn part1(input: &str) -> u64 {
     while let Some((row, col)) = iter.next() {
         if let Some(v) = p1_recurse_search(&board, row, col) {
             matches.push(v);
+            #[allow(clippy::while_let_on_iterator)]
             while let Some((row, col)) = iter.next() {
                 match board.get(row, col).unwrap() {
                     Element::Number { .. } => {}
@@ -201,10 +196,7 @@ fn p1_recurse_search(board: &Board, row: isize, col: isize) -> Option<u64> {
             (1, 1),
         ];
 
-        for (row, col) in deltas
-            .into_iter()
-            .filter_map(|(dr, dc)| Some((row + dr, col + dc)))
-        {
+        for (row, col) in deltas.into_iter().map(|(dr, dc)| (row + dr, col + dc)) {
             let e = if let Some(e) = board.get(row, col) {
                 e
             } else {
@@ -262,11 +254,8 @@ fn part2(input: &str) -> u64 {
     for row in 0..rows {
         for col in 0..cols {
             let ratio = board.gear_ratio(row, col);
-            match ratio {
-                Some(v) => {
-                    total += v;
-                }
-                None => {}
+            if let Some(v) = ratio {
+                total += v;
             }
         }
     }

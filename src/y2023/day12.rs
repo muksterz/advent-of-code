@@ -28,10 +28,7 @@ struct Spring {
 impl Spring {
     fn parse(input: &str, part2: bool) -> Self {
         let (s, nums_s) = input.trim().split_once(' ').unwrap();
-        let mut nums: Vec<usize> = nums_s
-            .split(',')
-            .map(|s| usize::from_str_radix(s, 10).unwrap())
-            .collect();
+        let mut nums: Vec<usize> = nums_s.split(',').map(|s| s.parse().unwrap()).collect();
         let mut parts: Vec<Part> = s.chars().map(Part::from_char).collect();
 
         let old_nums = nums.clone();
@@ -57,7 +54,7 @@ impl Spring {
     }
 
     fn solve(
-        mut cache: &mut HashMap<HashStruct, u64>,
+        cache: &mut HashMap<HashStruct, u64>,
         parts: &[Part],
         index: usize,
         lengths: &[usize],
@@ -107,10 +104,10 @@ impl Spring {
 
         if check(index, len, parts, lengths[lengths_index..].len() == 1) {
             let new_index = index + len + 1;
-            total += Spring::solve(&mut cache, parts, new_index, lengths, lengths_index + 1);
+            total += Spring::solve(cache, parts, new_index, lengths, lengths_index + 1);
         }
         if parts[index] != Part::Broken {
-            total += Spring::solve(&mut cache, parts, index + 1, lengths, lengths_index);
+            total += Spring::solve(cache, parts, index + 1, lengths, lengths_index);
         }
 
         cache.insert(hash, total);

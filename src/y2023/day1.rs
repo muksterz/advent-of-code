@@ -7,13 +7,13 @@ fn part1(input: &str) -> u64 {
     for line in input.lines() {
         let first = line
             .chars()
-            .filter_map(|c| u64::from_str_radix(&c.to_string(), 10).ok())
+            .filter_map(|c| c.to_string().parse::<u64>().ok())
             .next()
             .unwrap();
         let last = line
             .chars()
             .rev()
-            .filter_map(|c| u64::from_str_radix(&c.to_string(), 10).ok())
+            .filter_map(|c| c.to_string().parse::<u64>().ok())
             .next()
             .unwrap();
         total += first * 10 + last;
@@ -76,8 +76,8 @@ fn numberfy(s: &str, rev: bool) -> Option<u64> {
         }
     }
 
-    if let Ok(n) = u64::from_str_radix(&s[0..1], 10) {
-        output = Some(n);
+    if let Ok(n) = &s[0..1].parse::<u64>() {
+        output = Some(*n);
     }
 
     output

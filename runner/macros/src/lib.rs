@@ -85,8 +85,8 @@ impl Parse for Problem {
             return Err(syn::Error::new(part.span(), "Expected part"));
         }
 
-        let d = u64::from_str_radix(&d[3..], 10);
-        let p = u64::from_str_radix(&p[4..], 10);
+        let d = d[3..].parse();
+        let p = p[4..].parse();
         let d = match d {
             Ok(u) => u,
             Err(_) => return Err(syn::Error::new(day.span(), "expected number")),
@@ -108,7 +108,7 @@ struct Year {
 impl Parse for Year {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let yearl = input.parse::<proc_macro2::Literal>()?;
-        let year = u64::from_str_radix(&yearl.to_string(), 10);
+        let year = yearl.to_string().parse();
         let year = match year {
             Ok(u) => u,
             Err(_) => return Err(syn::Error::new(yearl.span(), "Expected number")),

@@ -23,9 +23,9 @@ impl Grid {
         let rows = lines.len();
         let cols = lines[0].len();
 
-        for y in 0..rows {
+        for (y, &line) in lines.iter().enumerate().take(rows) {
             for x in 0..cols {
-                if lines[y].chars().nth(x).unwrap() == '#' {
+                if line.chars().nth(x).unwrap() == '#' {
                     vec.push(Place {
                         x: x as i64,
                         y: y as i64,
@@ -82,8 +82,8 @@ fn part1(input: &str) -> u64 {
         let dx = p1.x - p2.x;
         let dy = p1.y - p2.y;
 
-        let dx = dx.abs() as u64;
-        let dy = dy.abs() as u64;
+        let dx = dx.unsigned_abs();
+        let dy = dy.unsigned_abs();
 
         total += dy + dx;
     }
@@ -105,8 +105,8 @@ fn part2(input: &str) -> u64 {
         let dx = p1.x - p2.x;
         let dy = p1.y - p2.y;
 
-        let dx = dx.abs() as u64;
-        let dy = dy.abs() as u64;
+        let dx = dx.unsigned_abs();
+        let dy = dy.unsigned_abs();
 
         let d = dx + dy;
 

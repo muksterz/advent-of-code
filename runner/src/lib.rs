@@ -42,12 +42,10 @@ pub fn run_year(year: u64) {
 
     let part1 = PROBLEMS
         .iter()
-        .filter(|p| p.day == day && p.year == year && p.part == 1)
-        .next();
+        .find(|p| p.day == day && p.year == year && p.part == 1);
     let part2 = PROBLEMS
         .iter()
-        .filter(|p| p.day == day && p.year == year && p.part == 2)
-        .next();
+        .find(|p| p.day == day && p.year == year && p.part == 2);
 
     if let Some(p1) = part1 {
         run_problem(p1);

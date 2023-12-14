@@ -16,14 +16,12 @@ impl Card {
         let (winning_nums, drew_nums) = nums.trim().split_once('|').unwrap();
 
         let winning_nums: Vec<u64> = winning_nums
-            .trim()
             .split_whitespace()
-            .map(|n| u64::from_str_radix(n, 10).unwrap())
+            .map(|n| n.parse().unwrap())
             .collect();
         let drew_nums: Vec<u64> = drew_nums
-            .trim()
             .split_whitespace()
-            .map(|n| u64::from_str_radix(n, 10).unwrap())
+            .map(|n| n.parse().unwrap())
             .collect();
 
         let matches = drew_nums

@@ -6,8 +6,8 @@ fn parse_range(input: &str) -> (Range, Range) {
     fn parse(input: &str) -> Range {
         let (l, r) = input.trim().split_once('-').unwrap();
 
-        let l = u64::from_str_radix(l, 10).unwrap();
-        let r = u64::from_str_radix(r, 10).unwrap();
+        let l = l.parse().unwrap();
+        let r = r.parse().unwrap();
         l..=r
     }
 

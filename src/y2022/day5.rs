@@ -41,11 +41,9 @@ impl Crates {
 
     fn execute_command(&mut self, c: Command) {
         for _ in 0..c.amount {
-
             let krate = self.stacks[c.from].pop().unwrap();
             self.stacks[c.to].push(krate)
         }
-
     }
 
     fn execute_command_2(&mut self, c: Command) {
@@ -62,7 +60,7 @@ impl Crates {
 struct Command {
     amount: usize,
     from: usize,
-    to: usize
+    to: usize,
 }
 
 fn parse_commands(input: &str) -> Vec<Command> {
@@ -70,14 +68,11 @@ fn parse_commands(input: &str) -> Vec<Command> {
     let mut commands = Vec::new();
 
     for l in iter {
-
-        
-        
-        let mut nums = l.split(' ').flat_map(|n| usize::from_str_radix(n, 10).ok());
+        let mut nums = l.split(' ').flat_map(|n| n.parse().ok());
         commands.push(Command {
             amount: nums.next().unwrap(),
             from: nums.next().unwrap() - 1,
-            to: nums.next().unwrap() - 1
+            to: nums.next().unwrap() - 1,
         })
     }
 
@@ -94,7 +89,7 @@ fn part1(input: &str) -> String {
     }
 
     let mut output = String::new();
-    
+
     for stack in crates.stacks.iter() {
         output.push(*stack.last().unwrap())
     }
@@ -112,7 +107,7 @@ fn part2(input: &str) -> String {
     }
 
     let mut output = String::new();
-    
+
     for stack in crates.stacks.iter() {
         output.push(*stack.last().unwrap())
     }

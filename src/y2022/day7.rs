@@ -1,19 +1,15 @@
-
 use std::{collections::HashMap, iter::Peekable};
 
 use runner::aoc;
 
-
 #[derive(Default)]
 struct FileSystem {
     files: HashMap<Path, File>,
-    directories: HashMap<Path, Directory>
+    directories: HashMap<Path, Directory>,
 }
 
 impl FileSystem {
     fn compute_size(&mut self, dir_p: &Path) -> u64 {
-
-
         let mut size = 0;
 
         let dir = self.directories.get(dir_p).cloned().unwrap();
@@ -25,7 +21,6 @@ impl FileSystem {
         for f in dir.files.iter().map(|f| self.files.get(f).unwrap()) {
             size += f.size;
         }
-
 
         for p in dir.directories.iter() {
             size += self.compute_size(p);
@@ -39,12 +34,12 @@ impl FileSystem {
 
 #[derive(Clone, Hash, PartialEq, Eq, Debug)]
 struct Path {
-    parts: Vec<String>
+    parts: Vec<String>,
 }
 
 impl Path {
     fn root() -> Self {
-        Self {parts: Vec::new()}
+        Self { parts: Vec::new() }
     }
 
     fn pop(&mut self) {
@@ -59,20 +54,18 @@ impl Path {
 struct Directory {
     files: Vec<Path>,
     directories: Vec<Path>,
-    size: Option<u64>
+    size: Option<u64>,
 }
 
 #[derive(Default, Debug)]
 struct File {
-    size: u64
+    size: u64,
 }
 
-
 fn ls<'a>(fs: &mut FileSystem, dir: &Path, iter: &mut Peekable<impl Iterator<Item = &'a str>>) {
-    while iter.peek().is_some() && !iter.peek().unwrap().starts_with("$") {
+    while iter.peek().is_some() && !iter.peek().unwrap().starts_with('$') {
         let file = iter.next().unwrap();
         if file.starts_with("dir") {
-
             let (_, name) = file.split_once(' ').unwrap();
             let mut p = dir.clone();
             p.push(name.into());
@@ -80,12 +73,11 @@ fn ls<'a>(fs: &mut FileSystem, dir: &Path, iter: &mut Peekable<impl Iterator<Ite
             let c_dir = fs.directories.get_mut(dir).unwrap();
             c_dir.directories.push(p);
         } else {
-
             let (size, name) = file.split_once(' ').unwrap();
-            let size = u64::from_str_radix(size, 10).unwrap();
+            let size = size.parse().unwrap();
             let mut p = dir.clone();
             p.push(name.into());
-            fs.files.insert(p.clone(), File {size});
+            fs.files.insert(p.clone(), File { size });
             let c_dir = fs.directories.get_mut(dir).unwrap();
             c_dir.files.push(p);
         }
@@ -103,7 +95,7 @@ fn create_fs(input: &str) -> FileSystem {
     while let Some(c) = commands.next() {
         if c.starts_with("$ ls") {
             ls(&mut fs, &working_dir, &mut commands);
-        } else if c.starts_with("$ cd"){
+        } else if c.starts_with("$ cd") {
             let d = c.split_whitespace().last().unwrap();
             if d == ".." {
                 working_dir.pop();
@@ -148,7 +140,7 @@ fn part2(input: &str) -> u64 {
     let dirs = fs.directories.keys().cloned().collect::<Vec<_>>();
 
     for p in dirs.iter() {
-        let size = fs.compute_size(&p);
+        let size = fs.compute_size(p);
         if size >= space_needed {
             smallest_size = smallest_size.min(size);
         }
@@ -186,7 +178,8 @@ mod tests {
             8033020 d.log
             5626152 d.ext
             7214296 k
-        ".trim();
+        "
+        .trim();
 
         assert_eq!(super::part1(input), 95437);
     }
@@ -217,7 +210,8 @@ mod tests {
             8033020 d.log
             5626152 d.ext
             7214296 k
-        ".trim();
+        "
+        .trim();
 
         assert_eq!(super::part2(input), 24933642);
     }

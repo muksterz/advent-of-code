@@ -1,10 +1,11 @@
-
 use runner::aoc;
-
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Direction {
-    N, S, E, W
+    N,
+    S,
+    E,
+    W,
 }
 
 impl Direction {
@@ -13,7 +14,7 @@ impl Direction {
             Direction::N => row = row.saturating_sub(1),
             Direction::S => row += 1,
             Direction::W => col = col.saturating_sub(1),
-            Direction::E => col += 1
+            Direction::E => col += 1,
         }
 
         (row, col)
@@ -22,7 +23,7 @@ impl Direction {
     fn on_edge(self, row: usize, col: usize, rows: usize, cols: usize) -> bool {
         match self {
             Direction::N => row == 0,
-            Direction::E => col == cols-1,
+            Direction::E => col == cols - 1,
             Direction::S => row == rows - 1,
             Direction::W => col == 0,
         }
@@ -31,7 +32,7 @@ impl Direction {
 
 #[derive(PartialEq, Eq, Clone)]
 struct Grid {
-    rows: Vec<Vec<char>>
+    rows: Vec<Vec<char>>,
 }
 
 impl Grid {
@@ -49,17 +50,15 @@ impl Grid {
     }
 
     fn next_free(&self, mut row: usize, mut col: usize, dir: Direction) -> (usize, usize) {
-
         let rows = self.rows.len();
         let cols = self.rows[0].len();
 
         assert!(self.rows[row][col] == 'O');
 
-
         while !dir.on_edge(row, col, rows, cols) {
             let (new_row, new_col) = dir.next(row, col);
             if self.rows[new_row][new_col] != '.' {
-                return (row, col)
+                return (row, col);
             }
             (row, col) = (new_row, new_col);
         }
@@ -71,11 +70,14 @@ impl Grid {
         let cols = self.rows[0].len();
 
         let mut row_iter = Box::new(0..rows) as Box<dyn Iterator<Item = usize>>;
-        let mut col_iter: Box<dyn Fn() -> Box<dyn Iterator<Item=usize>>> = Box::new(|| Box::new(0..cols) as Box<dyn Iterator<Item = usize>>);
+        let mut col_iter: Box<dyn Fn() -> Box<dyn Iterator<Item = usize>>> =
+            Box::new(|| Box::new(0..cols) as Box<dyn Iterator<Item = usize>>);
 
         match dir {
             Direction::S => row_iter = Box::new((0..rows).rev()) as Box<dyn Iterator<Item = usize>>,
-            Direction::E => col_iter = Box::new(|| Box::new((0..cols).rev()) as Box<dyn Iterator<Item = usize>>),
+            Direction::E => {
+                col_iter = Box::new(|| Box::new((0..cols).rev()) as Box<dyn Iterator<Item = usize>>)
+            }
             _ => {}
         }
 
@@ -85,7 +87,6 @@ impl Grid {
                     let (new_row, new_col) = self.next_free(row, col, dir);
                     self.rows[row][col] = '.';
                     self.rows[new_row][new_col] = 'O';
-
                 }
             }
         }
@@ -131,7 +132,6 @@ fn part2(input: &str) -> u64 {
         } else {
             old.push(grid.clone())
         }
-
     }
 
     let mut cycle_start = 0;
@@ -144,8 +144,6 @@ fn part2(input: &str) -> u64 {
     let cycle_len = old.len();
 
     let index = (1_000_000_000 - cycle_start) % cycle_len;
-
-
 
     old[index].moment()
 }

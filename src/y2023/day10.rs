@@ -28,8 +28,7 @@ impl Grid {
     fn get(&self, c: Coord) -> Option<&Cell> {
         self.cells
             .get(c.row as usize)
-            .map(|s| s.get(c.col as usize))
-            .flatten()
+            .and_then(|s| s.get(c.col as usize))
     }
 
     fn start_pos(&self) -> Coord {
@@ -91,8 +90,7 @@ impl Grid {
         offsets
             .into_iter()
             .map(|c| c + pos)
-            .filter(|&n| n != from)
-            .next()
+            .find(|&n| n != from)
             .unwrap()
     }
 }

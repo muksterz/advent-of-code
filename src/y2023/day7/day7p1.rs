@@ -87,7 +87,7 @@ impl Hand {
         let highest = cs[0].1;
         let second = cs.get(1).map(|l| l.1).unwrap_or_default();
 
-        let t = match (highest, second) {
+        match (highest, second) {
             (5, _) => Type::FiveOfAKind,
             (4, _) => Type::FourOfAKind,
             (3, 2) => Type::FullHouse,
@@ -96,9 +96,7 @@ impl Hand {
             (2, _) => Type::OnePair,
             (1, _) => Type::HighCard,
             _ => unreachable!(),
-        };
-
-        t
+        }
     }
 }
 
@@ -177,7 +175,7 @@ fn parse_hand(input: &str) -> Hand {
             'Q' => Card::Q,
             'J' => Card::J,
             'T' => Card::T,
-            c => Card::N(u64::from_str_radix(&c.to_string(), 10).unwrap()),
+            c => Card::N(c.to_string().parse().unwrap()),
         };
 
         cards[i] = card;
@@ -185,7 +183,7 @@ fn parse_hand(input: &str) -> Hand {
 
     Hand {
         cards,
-        bid: u64::from_str_radix(bid, 10).unwrap(),
+        bid: bid.parse().unwrap(),
     }
 }
 
