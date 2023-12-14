@@ -20,29 +20,7 @@ pub mod __internals {
 
 pub fn run_recent() {
     let year = PROBLEMS.iter().map(|p| p.year).max().unwrap();
-    let day = PROBLEMS
-        .iter()
-        .filter(|p| p.year == year)
-        .map(|p| p.day)
-        .max()
-        .unwrap();
-
-    let part1 = PROBLEMS
-        .iter()
-        .filter(|p| p.day == day && p.year == year && p.part == 1)
-        .next();
-    let part2 = PROBLEMS
-        .iter()
-        .filter(|p| p.day == day && p.year == year && p.part == 2)
-        .next();
-
-    if let Some(p1) = part1 {
-        run_problem(p1);
-    }
-
-    if let Some(p2) = part2 {
-        run_problem(p2)
-    }
+    run_year(year);
 }
 
 fn run_problem(p: &Problem) {
