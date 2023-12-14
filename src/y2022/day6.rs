@@ -26,8 +26,6 @@ fn part1(input: &str) -> u64 {
         let loc = i % 4;
         buffer[loc] = c;
 
-        //println!("{buffer:?} unique: {}", check_unique(buffer));
-
         if check_unique(&buffer) {
             return i as u64 + 1;
         }
@@ -53,8 +51,6 @@ fn part2(input: &str) -> u64 {
     for(i, c) in iter {
         let loc = i % buffer.len();
         buffer[loc] = c;
-
-        //println!("{buffer:?} unique: {}", check_unique(buffer));
 
         if check_unique(&buffer) {
             return i as u64 + 1;
