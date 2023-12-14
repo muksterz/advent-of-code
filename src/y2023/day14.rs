@@ -142,22 +142,9 @@ fn part2(input: &str) -> u64 {
     }
 
     let cycle_len = old.len();
-    println!("{cycle_len} {cycle_start}");
 
     let index = (1_000_000_000 - cycle_start) % cycle_len;
 
-    println!("{index}");
-
-    /*for g in old.iter() {
-        println!("\n{}", g.moment());
-        for r in g.rows.iter() {
-            println!("{}", r.iter().collect::<String>())
-        }
-    }
-    println!("\nLast\n{}:", last.moment());
-    for r in last.rows.iter() {
-        println!("{}", r.iter().collect::<String>())
-    }*/
 
 
     old[index].moment()
