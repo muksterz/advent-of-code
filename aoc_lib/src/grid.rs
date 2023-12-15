@@ -115,6 +115,14 @@ impl<T> Grid<T> {
             end,
         }
     }
+
+    pub fn coords(&self) -> Coords {
+        Coords::new(
+            Coord::new(0, 0),
+            Coord::new(self.num_rows(), self.num_cols()),
+        )
+    }
+
 }
 
 impl<T> IndexMut<Coord> for Grid<T> {
@@ -138,6 +146,37 @@ impl<T, const R: usize, const C: usize> From<[[T; C]; R]> for Grid<T> {
             cols: C,
             rows: R,
             data: value.into_iter().flatten().collect(),
+        }
+    }
+}
+
+pub struct Coords {
+    start: Coord,
+    end: Coord,
+    current: Coord
+}
+impl Coords {
+    fn new(start: Coord, end: Coord) -> Self {
+        Self {
+            start, end, current: start
+        }
+    }
+}
+impl Iterator for Coords {
+    type Item = Coord;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.current.row == self.end.row {
+            None
+        } else{
+            let mut next = self.current + Coord::new(0, 1);
+            if next.col == self.end.col {
+                next.col = self.start.col;
+                next += Coord::new(1, 0);
+            }
+            let current = self.current;
+            self.current = next;
+            Some(current)
         }
     }
 }
@@ -1380,7 +1419,7 @@ impl Step for i64 {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Default, Hash)]
+#[derive(Debug, PartialEq, Eq, Default, Hash, Copy, Clone)]
 pub struct Coord {
     pub row: i64,
     pub col: i64,
