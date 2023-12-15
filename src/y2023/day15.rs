@@ -44,8 +44,6 @@ impl <K: Eq, V> VecMap<K, V> {
             self.vals.remove(i);
         } 
     }
-
-
     fn values(&self) -> impl Iterator<Item = &V> {
         self.vals.iter().map(|i| &i.1)
     }

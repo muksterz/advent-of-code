@@ -13,7 +13,6 @@ members = [
 
 [workspace.dependencies]
 linkme = "0.3.18"
-aoc_lib = {path = "aoc_lib"}
 
 [dependencies]
 itertools = "0.12.0"
