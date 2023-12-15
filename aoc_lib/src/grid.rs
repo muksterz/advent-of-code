@@ -4,7 +4,7 @@ use std::{
     marker::PhantomData,
     ops::{
         Add, AddAssign, Bound, Index, IndexMut, Mul, MulAssign, Range, RangeBounds, Sub, SubAssign,
-    },
+    }, panic::UnwindSafe,
 };
 
 #[derive(Clone, PartialEq, Eq, Hash)]
@@ -227,6 +227,9 @@ impl<'grid, T> From<&'grid Grid<T>> for RawGridRef<'grid, T> {
         value.raw_ref()
     }
 }
+unsafe impl <'grid, T: Sync> Send for RawGridRef<'grid, T> {}
+unsafe impl <'grid, T: Sync> Sync for RawGridRef<'grid, T> {}
+impl <'grid, T: UnwindSafe> UnwindSafe for RawGridRef<'grid, T> {}
 
 #[derive(Debug)]
 struct RawGridMut<'grid, T> {
@@ -287,6 +290,10 @@ impl<'grid, T> From<&'grid mut Grid<T>> for RawGridMut<'grid, T> {
         value.raw_mut()
     }
 }
+unsafe impl <'grid, T: Send> Send for RawGridMut<'grid, T> {}
+unsafe impl <'grid, T: Sync> Sync for RawGridMut<'grid, T> {}
+impl <'grid, T: UnwindSafe> UnwindSafe for RawGridMut<'grid, T> {}
+
 
 #[derive(Debug)]
 pub struct Rows<'grid, T> {
@@ -642,13 +649,13 @@ impl<'grid, T> Row<'grid, T> {
     #[track_caller]
     pub fn slice<I: RangeBounds<i64>>(&self, range: I) -> Self {
         let start = match range.start_bound() {
-            Bound::Included(&i) => i,
-            Bound::Excluded(&i) => i + 1,
+            Bound::Included(&i) => self.start + i,
+            Bound::Excluded(&i) => self.start + i + 1,
             Bound::Unbounded => self.start,
         };
         let end = match range.end_bound() {
-            Bound::Included(&i) => i + 1,
-            Bound::Excluded(&i) => i,
+            Bound::Included(&i) => self.start + i + 1,
+            Bound::Excluded(&i) => self.start + i,
             Bound::Unbounded => self.end,
         };
         assert!(self.start <= start);
@@ -704,7 +711,7 @@ impl<'grid, T> Sequence for Row<'grid, T> {
         self.get(index)
     }
     fn bounds(&self) -> Range<Self::Index> {
-        self.start..self.end
+        0..(self.end - self.start)
     }
     fn slice<I: RangeBounds<Self::Index>>(&self, range: I) -> Self {
         self.slice(range)
@@ -804,18 +811,20 @@ impl<'grid, T> RowMut<'grid, T> {
             end: self.end,
         }
     }
+    #[track_caller]
     pub fn slice<I: RangeBounds<i64>>(&self, range: I) -> Row<T> {
         self.as_ref().slice(range)
     }
-    pub fn slice_mut<I: RangeBounds<i64>>(&mut self, range: I) -> RowMut<T> {
+    #[track_caller]
+    pub fn slice_mut<I: RangeBounds<i64>>(self, range: I) -> RowMut<'grid, T> {
         let start = match range.start_bound() {
-            Bound::Included(&i) => i,
-            Bound::Excluded(&i) => i + 1,
+            Bound::Included(&i) => self.start + i,
+            Bound::Excluded(&i) => self.start + i + 1,
             Bound::Unbounded => self.start,
         };
         let end = match range.end_bound() {
-            Bound::Included(&i) => i + 1,
-            Bound::Excluded(&i) => i,
+            Bound::Included(&i) => self.start + i + 1,
+            Bound::Excluded(&i) => self.start + i,
             Bound::Unbounded => self.end,
         };
         assert!(self.start <= start);
@@ -823,7 +832,7 @@ impl<'grid, T> RowMut<'grid, T> {
         // SAFETY: Lifetime of `RowMut` is bound by &mut self
         // so self is inaccessable while `RowMut` is alive
         RowMut {
-            grid: unsafe { self.grid.unchecked_copy() },
+            grid: self.grid,
             start,
             end,
             row: self.row,
@@ -877,20 +886,20 @@ impl<'grid, T> Sequence for RowMut<'grid, T> {
         self.get(index)
     }
     fn bounds(&self) -> Range<Self::Index> {
-        self.start..self.end
+        0..(self.end - self.start)
     }
     fn slice<I: RangeBounds<Self::Index>>(&self, range: I) -> Self::Slice<'_> {
         self.slice(range)
     }
 }
 impl<'grid, T> SequenceMut for RowMut<'grid, T> {
-    type SliceMut<'a> = RowMut<'a, T> where Self :'a;
+    type SliceMut = RowMut<'grid, T>;
 
     fn get_mut(&mut self, index: Self::Index) -> Option<&mut Self::Value> {
         self.get_mut(index)
     }
 
-    fn slice_mut<I: RangeBounds<Self::Index>>(&mut self, range: I) -> Self::SliceMut<'_> {
+    fn slice_mut<I: RangeBounds<Self::Index>>(self, range: I) -> Self::SliceMut {
         self.slice_mut(range)
     }
 }
@@ -998,13 +1007,13 @@ impl<'grid, T> Column<'grid, T> {
     #[track_caller]
     pub fn slice<I: RangeBounds<i64>>(&self, range: I) -> Self {
         let start = match range.start_bound() {
-            Bound::Included(&i) => i,
-            Bound::Excluded(&i) => i + 1,
+            Bound::Included(&i) => self.start + i,
+            Bound::Excluded(&i) => self.start + i + 1,
             Bound::Unbounded => self.start,
         };
         let end = match range.end_bound() {
-            Bound::Included(&i) => i + 1,
-            Bound::Excluded(&i) => i,
+            Bound::Included(&i) => self.start + i + 1,
+            Bound::Excluded(&i) => self.start + i,
             Bound::Unbounded => self.end,
         };
         assert!(self.start <= start);
@@ -1059,7 +1068,7 @@ impl<'grid, T> Sequence for Column<'grid, T> {
         self.get(index)
     }
     fn bounds(&self) -> Range<Self::Index> {
-        self.start..self.end
+        0..(self.end - self.start)
     }
     fn slice<I: RangeBounds<Self::Index>>(&self, range: I) -> Self {
         self.slice(range)
@@ -1148,26 +1157,26 @@ impl<'grid, T> ColumnMut<'grid, T> {
             col: self.col,
         }
     }
+    #[track_caller]
     pub fn slice<I: RangeBounds<i64>>(&self, range: I) -> Column<T> {
         self.as_ref().slice(range)
     }
-    pub fn slice_mut<I: RangeBounds<i64>>(&mut self, range: I) -> ColumnMut<T> {
+    #[track_caller]
+    pub fn slice_mut<I: RangeBounds<i64>>(self, range: I) -> ColumnMut<'grid, T> {
         let start = match range.start_bound() {
-            Bound::Included(&i) => i,
-            Bound::Excluded(&i) => i + 1,
+            Bound::Included(&i) => self.start + i,
+            Bound::Excluded(&i) => self.start + i + 1,
             Bound::Unbounded => self.start,
         };
         let end = match range.end_bound() {
-            Bound::Included(&i) => i + 1,
-            Bound::Excluded(&i) => i,
+            Bound::Included(&i) => self.start + i + 1,
+            Bound::Excluded(&i) => self.start + i,
             Bound::Unbounded => self.end,
         };
-        assert!(self.start <= start);
-        assert!(end <= self.end);
         // SAFETY: Lifetime of `RowMut` is bound by &mut self
         // so self is inaccessable while `RowMut` is alive
         ColumnMut {
-            grid: unsafe { self.grid.unchecked_copy() },
+            grid: self.grid,
             start,
             end,
             col: self.col,
@@ -1233,7 +1242,7 @@ impl<'grid, T> Sequence for ColumnMut<'grid, T> {
         self.get(index)
     }
     fn bounds(&self) -> Range<Self::Index> {
-        self.start..self.end
+        0..(self.end - self.start)
     }
 
     fn slice<I: RangeBounds<Self::Index>>(&self, range: I) -> Self::Slice<'_> {
@@ -1241,13 +1250,13 @@ impl<'grid, T> Sequence for ColumnMut<'grid, T> {
     }
 }
 impl<'grid, T> SequenceMut for ColumnMut<'grid, T> {
-    type SliceMut<'a> = ColumnMut<'a, T> where Self :'a;
+    type SliceMut = ColumnMut<'grid, T>;
 
     fn get_mut(&mut self, index: Self::Index) -> Option<&mut Self::Value> {
         self.get_mut(index)
     }
 
-    fn slice_mut<I: RangeBounds<Self::Index>>(&mut self, range: I) -> Self::SliceMut<'_> {
+    fn slice_mut<I: RangeBounds<Self::Index>>(self, range: I) -> Self::SliceMut {
         self.slice_mut(range)
     }
 }
@@ -1333,13 +1342,12 @@ pub trait Sequence {
 }
 
 pub trait SequenceMut: Sequence {
-    type SliceMut<'a>: Sequence<Index = Self::Index, Value = Self::Value>
-    where
-        Self: 'a;
+    type SliceMut: Sequence<Index = Self::Index, Value = Self::Value>;
+    
 
     fn get_mut(&mut self, index: Self::Index) -> Option<&mut Self::Value>;
 
-    fn slice_mut<I: RangeBounds<Self::Index>>(&mut self, range: I) -> Self::SliceMut<'_>;
+    fn slice_mut<I: RangeBounds<Self::Index>>(self, range: I) -> Self::SliceMut;
 
     fn swap<S>(&mut self, rhs: &mut S)
     where
@@ -1515,10 +1523,35 @@ macro_rules! impl_eq {
     };
 }
 
+macro_rules! impl_slice {
+    ($($ty:ident)*) => {
+        $(
+            impl <'grid, T: PartialEq<U>, U> PartialEq<[U]> for $ty<'grid, T> {
+                fn eq(&self, other: &[U]) -> bool {
+                    let mut i1 = self.iter();
+                    let mut i2 = other.iter();
+                    while let (Some(l), Some(r)) = (i1.next(), i2.next()) {
+                        if l != r {
+                            return false;
+                        }
+                    }
+                    i1.next().is_none() & i2.next().is_none()
+                }
+            }
+            impl <'grid, T: PartialEq<U>, U, const N: usize> PartialEq<[U; N]> for $ty<'grid, T> {
+                fn eq(&self, other: &[U; N]) -> bool {
+                    self.eq(other.as_slice())
+                }
+            }
+        )*
+    };
+}
+
 macro_rules! impl_traits {
     ($($ty:ident)*) => {
         for_all_pairs!(impl_partial_eq: $($ty)*);
         impl_eq!($($ty)*);
+        impl_slice!($($ty)*);
     };
 }
 
@@ -1639,7 +1672,7 @@ mod tests {
             assert_eq!(r.into_iter().sum::<i32>(), s);
         }
 
-        for (mut r, s) in grid.rows_mut().into_iter().zip(sums) {
+        for (r, s) in grid.rows_mut().into_iter().zip(sums) {
             let mut r = r.slice_mut(2..);
             assert_eq!(r.iter().sum::<i32>(), s);
             assert_eq!(r.iter_mut().map(|s| &*s).sum::<i32>(), s);
@@ -1652,14 +1685,49 @@ mod tests {
             assert_eq!(c.into_iter().sum::<i32>(), s);
         }
 
-        for (mut c, s) in grid.cols_mut().into_iter().zip(sums) {
+        for (c, s) in grid.cols_mut().into_iter().zip(sums) {
             let mut c = c.slice_mut(2..);
             assert_eq!(c.iter().sum::<i32>(), s);
             assert_eq!(c.iter_mut().map(|s| &*s).sum::<i32>(), s);
             assert_eq!(c.into_iter().map(|s| &*s).sum::<i32>(), s);
         }
+    
+        let r = grid.row(0);
+        let r1 = r.slice(3..);
+        let r2 = r1.slice(..);
+        assert_eq!(r1, r2);
     }
 
     #[test]
-    fn swap() {}
+    fn swap() {
+        let grid :Grid<u64> = [
+            [1;5],[2;5],[3;5],[4;5],[5;5]
+        ].into();
+
+        let mut g1 = grid.clone();
+        let mut rows = g1.rows_mut().into_iter();
+        let mut first = rows.next().unwrap();
+        let mut second = rows.next().unwrap();
+        first.swap(&mut second);
+
+        assert_eq!(g1.row(0).iter().sum::<u64>(), 10);
+        assert_eq!(g1.row(1).iter().sum::<u64>(), 5);
+
+        let mut g2 = grid.clone();
+        let mut rows = g2.rows_mut().into_iter();
+        let first = rows.next().unwrap();
+        let second = rows.next().unwrap();
+        first.slice_mut(2..).swap(&mut second.slice_mut(2..));
+        assert_eq!(g2.row(0).iter().sum::<u64>(), 8, "{:?}", g2.row(0));
+        assert_eq!(g2.row(1).iter().sum::<u64>(), 7, "{:?}", g2.row(1));
+
+    }
+
+    #[test]
+    fn get() {
+        let grid: Grid<_> = [[1, 2, 3, 4, 5]].into();
+        let r = grid.row(0);
+        let r = r.slice(2..);
+        assert_eq!(3, r[0])
+    }
 }
