@@ -1,9 +1,8 @@
-
 use std::collections::HashMap;
 
 use runner::aoc;
 
-use aoc_lib::{Grid, Coord};
+use aoc_lib::{Coord, Grid};
 
 fn parse(input: &str) -> Grid<i64> {
     let mut grid = Grid::build();
@@ -14,7 +13,6 @@ fn parse(input: &str) -> Grid<i64> {
             row.push(n as i64);
         }
         grid.push_row(row)
-        
     }
     grid.finish()
 }
@@ -22,32 +20,32 @@ fn parse(input: &str) -> Grid<i64> {
 #[derive(Hash, PartialEq, Eq)]
 struct State {
     location: Coord,
-    direction: Coord
+    direction: Coord,
 }
 
 fn highest(cache: &mut HashMap<State, i64>, grid: &Grid<i64>, loc: Coord, dir: Coord) -> i64 {
-
     if grid.get(loc).is_none() {
         return -1;
     }
 
-    let state = State {location: loc, direction: dir};
+    let state = State {
+        location: loc,
+        direction: dir,
+    };
     if let Some(&v) = cache.get(&state) {
         return v;
     };
 
     let next = loc + dir;
 
-
     let v = grid[loc].max(highest(cache, grid, next, dir));
 
     cache.insert(state, v);
     v
-
 }
 
 fn visible(cache: &mut HashMap<State, i64>, grid: &Grid<i64>, loc: Coord) -> bool {
-    let dirs = [Coord::N, Coord:: E, Coord::S, Coord::W];
+    let dirs = [Coord::N, Coord::E, Coord::S, Coord::W];
     let cur_height = grid[loc];
     for dir in dirs {
         let h = highest(cache, grid, loc + dir, dir);
@@ -75,7 +73,7 @@ fn viewing_distance(grid: &Grid<i64>, loc: Coord, dir: Coord) -> i64 {
 }
 
 fn scenic_score(grid: &Grid<i64>, loc: Coord) -> i64 {
-    let dirs = [Coord::N, Coord:: E, Coord::S, Coord::W];
+    let dirs = [Coord::N, Coord::E, Coord::S, Coord::W];
     let mut total = 1;
 
     for dir in dirs {
@@ -89,7 +87,10 @@ fn scenic_score(grid: &Grid<i64>, loc: Coord) -> i64 {
 fn part1(input: &str) -> usize {
     let grid = parse(input);
     let mut cache = HashMap::new();
-    grid.coords().map(|c| visible(&mut cache, &grid, c)).filter(|b| *b).count()
+    grid.coords()
+        .map(|c| visible(&mut cache, &grid, c))
+        .filter(|b| *b)
+        .count()
 }
 
 #[aoc(day8, part2)]
@@ -100,7 +101,7 @@ fn part2(input: &str) -> i64 {
 
 #[cfg(test)]
 mod tests {
-    
+
     const INPUT: &str = "
         30373
         25512

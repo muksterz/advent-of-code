@@ -4,7 +4,8 @@ use std::{
     marker::PhantomData,
     ops::{
         Add, AddAssign, Bound, Index, IndexMut, Mul, MulAssign, Range, RangeBounds, Sub, SubAssign,
-    }, panic::UnwindSafe,
+    },
+    panic::UnwindSafe,
 };
 
 #[derive(Clone, PartialEq, Eq, Hash)]
@@ -122,7 +123,6 @@ impl<T> Grid<T> {
             Coord::new(self.num_rows(), self.num_cols()),
         )
     }
-
 }
 
 impl<T> IndexMut<Coord> for Grid<T> {
@@ -153,12 +153,14 @@ impl<T, const R: usize, const C: usize> From<[[T; C]; R]> for Grid<T> {
 pub struct Coords {
     start: Coord,
     end: Coord,
-    current: Coord
+    current: Coord,
 }
 impl Coords {
     fn new(start: Coord, end: Coord) -> Self {
         Self {
-            start, end, current: start
+            start,
+            end,
+            current: start,
         }
     }
 }
@@ -168,7 +170,7 @@ impl Iterator for Coords {
     fn next(&mut self) -> Option<Self::Item> {
         if self.current.row == self.end.row {
             None
-        } else{
+        } else {
             let mut next = self.current + Coord::new(0, 1);
             if next.col == self.end.col {
                 next.col = self.start.col;
@@ -266,9 +268,9 @@ impl<'grid, T> From<&'grid Grid<T>> for RawGridRef<'grid, T> {
         value.raw_ref()
     }
 }
-unsafe impl <'grid, T: Sync> Send for RawGridRef<'grid, T> {}
-unsafe impl <'grid, T: Sync> Sync for RawGridRef<'grid, T> {}
-impl <'grid, T: UnwindSafe> UnwindSafe for RawGridRef<'grid, T> {}
+unsafe impl<'grid, T: Sync> Send for RawGridRef<'grid, T> {}
+unsafe impl<'grid, T: Sync> Sync for RawGridRef<'grid, T> {}
+impl<'grid, T: UnwindSafe> UnwindSafe for RawGridRef<'grid, T> {}
 
 #[derive(Debug)]
 struct RawGridMut<'grid, T> {
@@ -329,10 +331,9 @@ impl<'grid, T> From<&'grid mut Grid<T>> for RawGridMut<'grid, T> {
         value.raw_mut()
     }
 }
-unsafe impl <'grid, T: Send> Send for RawGridMut<'grid, T> {}
-unsafe impl <'grid, T: Sync> Sync for RawGridMut<'grid, T> {}
-impl <'grid, T: UnwindSafe> UnwindSafe for RawGridMut<'grid, T> {}
-
+unsafe impl<'grid, T: Send> Send for RawGridMut<'grid, T> {}
+unsafe impl<'grid, T: Sync> Sync for RawGridMut<'grid, T> {}
+impl<'grid, T: UnwindSafe> UnwindSafe for RawGridMut<'grid, T> {}
 
 #[derive(Debug)]
 pub struct Rows<'grid, T> {
@@ -1382,7 +1383,6 @@ pub trait Sequence {
 
 pub trait SequenceMut: Sequence {
     type SliceMut: Sequence<Index = Self::Index, Value = Self::Value>;
-    
 
     fn get_mut(&mut self, index: Self::Index) -> Option<&mut Self::Value>;
 
@@ -1730,7 +1730,7 @@ mod tests {
             assert_eq!(c.iter_mut().map(|s| &*s).sum::<i32>(), s);
             assert_eq!(c.into_iter().map(|s| &*s).sum::<i32>(), s);
         }
-    
+
         let r = grid.row(0);
         let r1 = r.slice(3..);
         let r2 = r1.slice(..);
@@ -1739,9 +1739,7 @@ mod tests {
 
     #[test]
     fn swap() {
-        let grid :Grid<u64> = [
-            [1;5],[2;5],[3;5],[4;5],[5;5]
-        ].into();
+        let grid: Grid<u64> = [[1; 5], [2; 5], [3; 5], [4; 5], [5; 5]].into();
 
         let mut g1 = grid.clone();
         let mut rows = g1.rows_mut().into_iter();
@@ -1759,7 +1757,6 @@ mod tests {
         first.slice_mut(2..).swap(&mut second.slice_mut(2..));
         assert_eq!(g2.row(0).iter().sum::<u64>(), 8, "{:?}", g2.row(0));
         assert_eq!(g2.row(1).iter().sum::<u64>(), 7, "{:?}", g2.row(1));
-
     }
 
     #[test]

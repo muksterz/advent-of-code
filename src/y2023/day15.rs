@@ -1,11 +1,9 @@
-
-
 use runner::aoc;
 
 fn hash(input: &str) -> u64 {
     let mut hash = 0;
     for c in input.bytes() {
-        if c ==b'\n' {
+        if c == b'\n' {
             continue;
         }
         hash += c as u64;
@@ -27,12 +25,18 @@ fn part1(input: &str) -> u64 {
 
 #[derive(Default, Debug, Clone)]
 struct VecMap<K, V> {
-    vals: Vec<(K, V)>
+    vals: Vec<(K, V)>,
 }
 
-impl <K: Eq, V> VecMap<K, V> {
+impl<K: Eq, V> VecMap<K, V> {
     fn insert(&mut self, k: K, v: V) {
-        if let Some(i) = self.vals.iter().enumerate().find(|(_, (ki, _))| ki == &k).map(|(i, _)| i) {
+        if let Some(i) = self
+            .vals
+            .iter()
+            .enumerate()
+            .find(|(_, (ki, _))| ki == &k)
+            .map(|(i, _)| i)
+        {
             self.vals[i] = (k, v);
         } else {
             self.vals.push((k, v));
@@ -40,9 +44,15 @@ impl <K: Eq, V> VecMap<K, V> {
     }
 
     fn remove(&mut self, k: &K) {
-        if let Some(i) = self.vals.iter().enumerate().find(|(_, (ki, _))| ki == k).map(|(i, _)| i) {
+        if let Some(i) = self
+            .vals
+            .iter()
+            .enumerate()
+            .find(|(_, (ki, _))| ki == k)
+            .map(|(i, _)| i)
+        {
             self.vals.remove(i);
-        } 
+        }
     }
     fn values(&self) -> impl Iterator<Item = &V> {
         self.vals.iter().map(|i| &i.1)
@@ -76,7 +86,7 @@ fn part2(input: &str) -> u64 {
             let j = j as u64;
             let b = j + 1;
             let c = v;
-            total += a*b*c;
+            total += a * b * c;
         }
     }
     total
@@ -91,7 +101,6 @@ mod tests {
         assert_eq!(super::part1(INPUT.trim()), 1320)
     }
 
-    
     #[test]
     fn part2() {
         assert_eq!(super::part2(INPUT), 145)
