@@ -24,9 +24,13 @@ pub fn run_recent() {
 }
 
 fn run_problem_p(p: &Problem) {
+    let input = std::fs::read_to_string(p.input).unwrap();
+
     let time = Instant::now();
-    let result = (p.f)(p.input);
+    let result = (p.f)(&input);
     let elapsed = time.elapsed();
+
+
     println!("[AOC - {} - day {} - part {}]", p.year, p.day, p.part);
     println!("\tresult: {result}");
     println!("\ttime: {}\n", humantime::format_duration(elapsed))

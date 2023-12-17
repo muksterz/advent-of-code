@@ -28,7 +28,7 @@ pub fn aoc(attr: TokenStream, input: TokenStream) -> TokenStream {
                 day: #day,
                 part: #part,
                 f: |i| #i(i).to_string(),
-                input: include_str!(concat!(env!("CARGO_MANIFEST_DIR"), #path))
+                input: concat!(env!("CARGO_MANIFEST_DIR"), #path)
             };
         };
 
