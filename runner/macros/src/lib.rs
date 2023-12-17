@@ -37,31 +37,7 @@ pub fn aoc(attr: TokenStream, input: TokenStream) -> TokenStream {
     .into()
 }
 
-#[allow(unused)]
-fn download_problem(year: u64, day: u64) {
-    let path = format!("https://adventofcode.com/{year}/day/{day}/input");
-    let output_path = format!("input/{year}/day{day}.txt");
 
-    if std::fs::metadata(&output_path).is_ok() {
-        //return;
-    }
-
-    let entry = keyring::Entry::new("aoc_runner", &whoami::username()).unwrap();
-    let token = entry.get_password().expect("No token found");
-
-    println!("{token}");
-    //return;
-    let mut c = std::process::Command::new("curl");
-    c.arg("-s")
-        .arg("--cookie")
-        .arg(format!("\"session={token}\""))
-        .arg("-o")
-        .arg(output_path)
-        .arg(path);
-
-    println!("{c:?}");
-    c.output().unwrap();
-}
 
 struct Problem {
     day: u64,
