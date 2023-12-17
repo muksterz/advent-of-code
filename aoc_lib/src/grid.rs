@@ -123,6 +123,10 @@ impl<T> Grid<T> {
             Coord::new(self.num_rows(), self.num_cols()),
         )
     }
+
+    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
+        self.data.iter_mut()
+    }
 }
 
 impl<T> IndexMut<Coord> for Grid<T> {
@@ -156,7 +160,7 @@ pub struct Coords {
     current: Coord,
 }
 impl Coords {
-    fn new(start: Coord, end: Coord) -> Self {
+    const fn new(start: Coord, end: Coord) -> Self {
         Self {
             start,
             end,
@@ -707,6 +711,12 @@ impl<'grid, T> Row<'grid, T> {
             row: self.row,
         }
     }
+    pub const fn coords(&self) -> Coords {
+        Coords::new(
+            Coord::new(self.row, self.start),
+            Coord::new(self.row + 1, self.end),
+        )
+    }
 }
 impl<'grid, T> Index<i64> for Row<'grid, T> {
     type Output = T;
@@ -877,6 +887,9 @@ impl<'grid, T> RowMut<'grid, T> {
             end,
             row: self.row,
         }
+    }
+    pub fn coords(&self) -> Coords {
+        self.as_ref().coords()
     }
 }
 impl<'grid, T> Index<i64> for RowMut<'grid, T> {
@@ -1065,6 +1078,12 @@ impl<'grid, T> Column<'grid, T> {
             col: self.col,
         }
     }
+    pub const fn coords(&self) -> Coords {
+        Coords::new(
+            Coord::new(self.start, self.col),
+            Coord::new(self.end, self.col + 1),
+        )
+    }
 }
 impl<'grid, T> Index<i64> for Column<'grid, T> {
     type Output = T;
@@ -1232,6 +1251,9 @@ impl<'grid, T> ColumnMut<'grid, T> {
             start: self.start,
             end: self.end,
         }
+    }
+    pub fn coords(&self) -> Coords {
+        self.as_ref().coords()
     }
 }
 impl<'grid, T> Index<i64> for ColumnMut<'grid, T> {
@@ -1431,6 +1453,8 @@ impl Coord {
     pub const E: Coord = Coord::new(0, 1);
     pub const W: Coord = Coord::new(0, -1);
 
+    pub const ORIGIN: Coord = Coord::new(0, 0);
+
     pub const fn new(row: i64, col: i64) -> Self {
         Self { row, col }
     }
@@ -1443,6 +1467,14 @@ impl Coord {
     }
     pub fn dist_taxicab(self, other: Coord) -> i64 {
         self.dist_manhatten(other)
+    }
+
+    pub fn rotate_cw_90(self) -> Self {
+        Coord::new(self.col, -self.row)
+    }
+
+    pub fn rotate_ccw_90(self) -> Self {
+        Coord::new(-self.col, self.row)
     }
 }
 
@@ -1765,5 +1797,46 @@ mod tests {
         let r = grid.row(0);
         let r = r.slice(2..);
         assert_eq!(3, r[0])
+    }
+
+    #[test]
+    fn coords() {
+        let grid: Grid<_> = [[0; 5]; 5].into();
+
+        let row_coords: Vec<_> = grid.coords().collect();
+
+        let mut col_coords = Vec::new();
+
+        for col in 0..grid.num_cols() {
+            for row in 0..grid.num_rows() {
+                col_coords.push(Coord::new(row, col))
+            }
+        }
+
+        let mut i1 = row_coords.iter().copied();
+        let mut i2 = grid.rows().iter().flat_map(|r| r.coords());
+
+        for (c1, c2) in (&mut i1).zip(&mut i2) {
+            assert_eq!(c1, c2);
+        }
+
+        assert!(i1.next().is_none());
+        assert!(i2.next().is_none());
+
+        let mut i1 = col_coords.iter().copied();
+        let mut i2 = grid.cols().iter().flat_map(|c| c.coords());
+
+        for (c1, c2) in (&mut i1).zip(&mut i2) {
+            assert_eq!(c1, c2);
+        }
+
+        assert!(i1.next().is_none());
+        assert!(i2.next().is_none());
+    }
+
+    #[test]
+    fn coord_rotate() {
+        assert_eq!(Coord::N.rotate_cw_90(), Coord::E);
+        assert_eq!(Coord::N.rotate_ccw_90(), Coord::W);
     }
 }

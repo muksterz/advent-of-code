@@ -23,7 +23,7 @@ pub fn run_recent() {
     run_year(year);
 }
 
-fn run_problem(p: &Problem) {
+fn run_problem_p(p: &Problem) {
     let time = Instant::now();
     let result = (p.f)(p.input);
     let elapsed = time.elapsed();
@@ -40,6 +40,10 @@ pub fn run_year(year: u64) {
         .max()
         .unwrap();
 
+    run_problem(year, day);
+}
+
+pub fn run_problem(year: u64, day: u64) {
     let part1 = PROBLEMS
         .iter()
         .find(|p| p.day == day && p.year == year && p.part == 1);
@@ -48,10 +52,10 @@ pub fn run_year(year: u64) {
         .find(|p| p.day == day && p.year == year && p.part == 2);
 
     if let Some(p1) = part1 {
-        run_problem(p1);
+        run_problem_p(p1);
     }
 
     if let Some(p2) = part2 {
-        run_problem(p2)
+        run_problem_p(p2)
     }
 }

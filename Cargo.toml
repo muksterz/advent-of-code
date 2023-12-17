@@ -19,4 +19,5 @@ aoc_lib = {path ="aoc_lib"}
 itertools = "0.12.0"
 linkme.workspace = true
 peg = "0.8.2"
+rayon = "1.8.0"
 runner = {path = "./runner"}
