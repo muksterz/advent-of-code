@@ -190,9 +190,7 @@ fn solve(commands: &[(Coord, i64)]) -> i64 {
 
     
 
-    for (v, cv) in vertexes.iter().zip(&compressed_vertexes) {
-        println!("{cv:?} {v:?}");
-    }
+    
 
 
     todo!()
