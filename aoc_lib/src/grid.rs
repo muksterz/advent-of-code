@@ -1577,10 +1577,9 @@ impl AABB {
     }
 
     pub fn add(&mut self, c: Coord) {
-        if c < self.start {
-            self.start.row = self.start.row.min(c.row);
-            self.start.col = self.start.col.min(c.col)
-        }
+
+        self.start.row = self.start.row.min(c.row);
+        self.start.col = self.start.col.min(c.col);
 
         if self.end.row <= c.row {
             self.end.row = c.row + 1
