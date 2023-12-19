@@ -37,8 +37,6 @@ pub fn aoc(attr: TokenStream, input: TokenStream) -> TokenStream {
     .into()
 }
 
-
-
 struct Problem {
     day: u64,
     part: u64,

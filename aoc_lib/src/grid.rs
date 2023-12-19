@@ -1455,6 +1455,9 @@ impl Coord {
 
     pub const ORIGIN: Coord = Coord::new(0, 0);
 
+    pub const MAX: Coord = Coord::new(i64::MAX, i64::MAX);
+    pub const MIN: Coord = Coord::new(i64::MIN, i64::MIN);
+
     pub const fn new(row: i64, col: i64) -> Self {
         Self { row, col }
     }
@@ -1547,6 +1550,90 @@ impl MulAssign<i64> for Coord {
 impl MulAssign<u64> for Coord {
     fn mul_assign(&mut self, rhs: u64) {
         *self *= rhs as i64
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Hash)]
+
+pub struct AABB {
+    start: Coord,
+    end: Coord,
+}
+
+impl AABB {
+    pub const fn new() -> Self {
+        AABB {
+            start: Coord::MAX,
+            end: Coord::MIN,
+        }
+    }
+
+    pub fn from_points(points: impl IntoIterator<Item = Coord>) -> Self {
+        let mut aabb = Self::new();
+        for p in points.into_iter() {
+            aabb.add(p);
+        }
+        aabb
+    }
+
+    pub fn add(&mut self, c: Coord) {
+        if c < self.start {
+            self.start.row = self.start.row.min(c.row);
+            self.start.col = self.start.col.min(c.col)
+        }
+
+        if self.end.row <= c.row {
+            self.end.row = c.row + 1
+        }
+        if self.end.col <= c.col {
+            self.end.col = c.col + 1
+        }
+    }
+
+    pub fn contains(&self, c: Coord) -> bool {
+        self.start <= c && c < self.end
+    }
+
+    pub fn coords(&self) -> Coords {
+        Coords::new(self.start, self.end)
+    }
+    pub fn rows(&self) -> RowCoords {
+        RowCoords {
+            start: self.start,
+            end: self.end,
+        }
+    }
+}
+
+pub struct RowCoords {
+    start: Coord,
+    end: Coord,
+}
+
+impl Iterator for RowCoords {
+    type Item = Coords;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.start.row == self.end.row {
+            None
+        } else {
+            let start = self.start;
+            let end = Coord::new(self.start.row + 1, self.end.col);
+            self.start.row += 1;
+            Some(Coords::new(start, end))
+        }
+    }
+}
+impl DoubleEndedIterator for RowCoords {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        if self.start.row == self.end.row {
+            None
+        } else {
+            self.end.row -= 1;
+            let start = self.end;
+            let end = Coord::new(self.end.row + 1, self.end.col);
+            Some(Coords::new(start, end))
+        }
     }
 }
 

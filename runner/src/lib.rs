@@ -30,7 +30,6 @@ fn run_problem_p(p: &Problem) {
     let result = (p.f)(&input);
     let elapsed = time.elapsed();
 
-
     println!("[AOC - {} - day {} - part {}]", p.year, p.day, p.part);
     println!("\tresult: {result}");
     println!("\ttime: {}\n", humantime::format_duration(elapsed))

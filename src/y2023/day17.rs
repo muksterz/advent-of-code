@@ -55,7 +55,6 @@ fn solve1(grid: &Grid<i64>) -> i64 {
 
     queue.push(start);
 
-
     while let Some(c) = queue.pop() {
         let cached_state = CachedState {
             loc: c.loc,
@@ -100,7 +99,6 @@ fn solve1(grid: &Grid<i64>) -> i64 {
                 run_dir: d,
                 heat: c.heat + next_loss,
             };
-
 
             queue.push(state)
         }
@@ -180,15 +178,12 @@ fn solve2(grid: &Grid<i64>) -> i64 {
                 continue;
             };
 
-
             let state = State {
                 loc: next_loc,
                 run_len,
                 run_dir: d,
                 heat: c.heat + next_loss,
             };
-
-
 
             queue.push(state)
         }
